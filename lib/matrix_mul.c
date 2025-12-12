@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <matrix_mul.h>
 
 void populateMatrix(int *matrix, int n) {
 
