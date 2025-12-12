@@ -26,10 +26,10 @@ int main(int argc, char **argv) {
 
   // Generate Random initial matrix
     srand(0);
-    populateMatrix(matrix1, i);
-    populateMatrix(matrix2, i);
-    printMatrix(matrix1, i);
-    printMatrix(matrix2, i);
+    populate_matrix(matrix1, i);
+    populate_matrix(matrix2, i);
+    print_matrix(matrix1, i);
+    print_matrix(matrix2, i);
 
 //
 //      // Check if matrix multiplication is possible

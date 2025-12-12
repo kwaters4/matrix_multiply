@@ -1,6 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <matrix_mul.h>
+
+/**
+ * @brief Allocates square 2x2 integer matrix
+ *
+ * @return void
+ */
+int* malloc_matrix_int(int n){
+  int *matrix = malloc((n*n) * sizeof(int));
+  return matrix;
+}
+
+/**
+ * @brief Free integer matrix
+ *
+ * @return void
+ */
+void free_matrix_int(int *matrix){
+  free(matrix);
+}
 
 /**
  * @brief Generates nxn zero matrix
@@ -16,8 +36,12 @@ void generate_zero_matrix(int *matrix, int n){
     }
 }
 
+/**
+ * @brief Generates nxn identity matrix
+ *
+ * @return void
+ */
 void generate_identity_matrix(int *matrix, int n){
-
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
       if (i == j) {
@@ -34,8 +58,7 @@ void generate_identity_matrix(int *matrix, int n){
  *
  * @return Returns -1 if they do not match, 0 if they do (int)
  */
-int compareMatrices(int *matrix1, int *matrix2, int n){
-
+int compare_matrices(int *matrix1, int *matrix2, int n){
   for (int i = 0; i < n*n; i++) {
     if (matrix1[i] != matrix2[i])
       return -1;
@@ -44,15 +67,13 @@ int compareMatrices(int *matrix1, int *matrix2, int n){
 }
 
 /**
- * @brief Populates a nxn random matrix with random values less than 10
+ * @brief Populates a nxn random matrix with random between -MIN and MAX
  *
  * @return void)
  */
-void populateMatrix(int *matrix, int n) {
-
+void populate_matrix(int *matrix, int n) {
   for (int i = 0; i < n*n; i++) {
-    matrix[i] = i;
-    matrix[i] = rand() % 10;
+    matrix[i] = (rand() % (MAX - MIN + 1)) + MIN;
   }
 }
 
@@ -61,7 +82,7 @@ void populateMatrix(int *matrix, int n) {
  *
  * @return Returns 0 if successful (int)
  */
-int printMatrix(int *matrix, int n) {
+int print_matrix(int *matrix, int n) {
   printf("Printed matrix (%dx%d):\n",n, n);
   for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {
@@ -77,16 +98,44 @@ int printMatrix(int *matrix, int n) {
  *
  * @return void 0
  */
-void multiplyMatrices(int *matrix1, int *matrix2, int *result, int n){
-
+void multiply_matrices(int *matrix1, int *matrix2, int *result, int n){
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             for (int k = 0; k < n; k++) {
-                result[i * n + j] += matrix1[i * n + j] * matrix2[j * n + i];
+                result[i * n + j] += matrix1[i * n + k] * matrix2[k * n + j];
             }
         }
     }
 }
 
+/**
+ * @brief Multiplies two matrices together and puts the result in a third
+ *
+ * @return void 0
+ */
+void multiply_matrices_sum(int *matrix1, int *matrix2, int *result, int n){
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      int sum = 0;
+      for (int k = 0; k < n; k++) {
+        sum += matrix1[i * n + k] * matrix2[k * n + j];
+      }
+    result[i * n + j] = sum;
+    }
+  }
+}
 
-
+/**
+ * @brief Multiplies two matrices together and puts the result in a third
+ *
+ * @return void 0
+ */
+void multiply_matrices_strip(int *matrix1, int *matrix2, int *result, int n){
+  for (int i = 0; i < n; i++) {
+    for (int k = 0; k < n; k++) {
+      for (int j = 0; j < n; j++) {
+        result[i * n + j] += matrix1[i * n + k] * matrix2[k * n + j];
+      }
+    }
+  }
+}
