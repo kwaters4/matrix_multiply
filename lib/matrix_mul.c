@@ -144,3 +144,26 @@ void multiply_matrices_strip(int *matrix1, int *matrix2, int *result, int n){
     }
   }
 }
+
+/**
+ * @brief Multiplies two matrices together and puts the result in a third
+ *
+ * @return void 0
+ */
+void multiply_matrices_strip_unrolled(int *matrix1, int *matrix2, int *result, int n){
+  if (n < 4){
+    printf("%d is too small, requires n>=4 and a factor of 4.\n",n);
+    printf("Exiting....\n");
+    exit(1);
+  }
+  for (int i = 0; i < n; i++) {
+    for (int k = 0; k < n; k++) {
+      for (int j = 0; j < n; j+=4) {
+        result[i * n + j] += matrix1[i * n + k] * matrix2[k * n + j];
+        result[i * n + j + 1] += matrix1[i * n + k] * matrix2[k * n + j + 1];
+        result[i * n + j + 2] += matrix1[i * n + k] * matrix2[k * n + j + 2];
+        result[i * n + j + 3] += matrix1[i * n + k] * matrix2[k * n + j + 3];
+      }
+    }
+  }
+}

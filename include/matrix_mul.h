@@ -15,3 +15,4 @@ int print_matrix(int *matrix, int n);
 void multiply_matrices(int *matrix1, int *matrix2, int *result, int n);
 void multiply_matrices_sum(int *matrix1, int *matrix2, int *result, int n);
 void multiply_matrices_strip(int *matrix1, int *matrix2, int *result, int n);
+void multiply_matrices_strip_unrolled(int *matrix1, int *matrix2, int *result, int n);
