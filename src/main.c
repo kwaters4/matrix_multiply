@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include <matrix_mul.h>
+#include <timer.h>
 
 int main(int argc, char **argv) {
 
@@ -13,10 +14,12 @@ int main(int argc, char **argv) {
   size_t min_size = atol(argv[1]);
   size_t max_size = atol(argv[2]);
 
-  for(int i = min_size; i<= max_size; i=2*i) {
-    int req_memory = 2*i*i*sizeof(int);
+  struct timer matrix_timer;
+  for(size_t i = min_size; i<= max_size; i=2*i) {
+    int req_memory = 3*i*i*sizeof(int);
     int *matrix1 = malloc((i*i) * sizeof(int));
     int *matrix2 = malloc((i*i) * sizeof(int));
+    int *result = malloc((i*i) * sizeof(int));
 
     // Check if the allocation failed.
     if (matrix1 == NULL || matrix2 == NULL){
@@ -24,25 +27,24 @@ int main(int argc, char **argv) {
       printf("Exiting...\n");
     }
 
+    double matrix_work = (double) (2*i*i*i - i*i);
+    printf("Work done: %f \n", matrix_work);
+
   // Generate Random initial matrix
     srand(0);
     populate_matrix(matrix1, i);
     populate_matrix(matrix2, i);
-    print_matrix(matrix1, i);
-    print_matrix(matrix2, i);
+    generate_zero_matrix(result, i);
+    printf("Multiplying %dx%d matrices...\n",i ,i);
+    timer_start(&matrix_timer, matrix_work);
+    multiply_matrices(matrix1, matrix2, result, i);
+    timer_stop(&matrix_timer);
+    double ipc = timer_calc_ipc(&matrix_timer);
+    printf("Calculated IPC: %f\n", ipc);
 
-//
-//      // Check if matrix multiplication is possible
-//      if (col1 != row2) {
-//          printf("Matrix multiplication is not possible. Number of columns in Matrix 1 must equal the number of rows in Matrix 2.\n");
-//          return -1;
-//      }
-//    // Input the matrices
-//    multiplyMatrices(matrix1, matrix2, result, row1, col1, row2, col2);
-//
-//    // Print the result
-//    printMatrix(result, row1, col2);
-  free(matrix1);
-  free(matrix2);
+    free(matrix1);
+    free(matrix2);
+    free(result);
+    timer_reset(&matrix_timer);
   }
 }

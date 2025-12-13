@@ -10,6 +10,11 @@
  */
 int* malloc_matrix_int(int n){
   int *matrix = malloc((n*n) * sizeof(int));
+  if (matrix == NULL){
+    printf("ERROR: Failed to allocate matrix of size %dx%d\n", n, n);
+    printf("Exiting...\n");
+    exit(1);
+  }
   return matrix;
 }
 
