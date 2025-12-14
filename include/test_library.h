@@ -1,7 +1,8 @@
 enum Mult_Algo {
   NAIVE,
   SUM,
-  STRIP
+  STRIP,
+  BLOCKED
 };
 
 void test_nxn_A(int *matrix, int n);

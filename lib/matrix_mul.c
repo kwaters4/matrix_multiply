@@ -8,8 +8,9 @@
  *
  * @return void
  */
-int* malloc_matrix_int(int n){
+int* malloc_matrix_int(int const n){
   int *matrix = malloc((n*n) * sizeof(int));
+//  int *matrix = aligned_alloc((size_t) 32, (size_t)(n*n) * sizeof(int));
   if (matrix == NULL){
     printf("ERROR: Failed to allocate matrix of size %dx%d\n", n, n);
     printf("Exiting...\n");
@@ -32,7 +33,7 @@ void free_matrix_int(int *matrix){
  *
  * @return void
  */
-void generate_zero_matrix(int *matrix, int n){
+void generate_zero_matrix(int *matrix, const int n){
     // Initialize the result matrix with 0s
   for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -46,7 +47,7 @@ void generate_zero_matrix(int *matrix, int n){
  *
  * @return void
  */
-void generate_identity_matrix(int *matrix, int n){
+void generate_identity_matrix(int *matrix, const int n){
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
       if (i == j) {
@@ -63,7 +64,7 @@ void generate_identity_matrix(int *matrix, int n){
  *
  * @return Returns -1 if they do not match, 0 if they do (int)
  */
-int compare_matrices(int *matrix1, int *matrix2, int n){
+int compare_matrices(const int *matrix1, const int *matrix2, const int n){
   for (int i = 0; i < n*n; i++) {
     if (matrix1[i] != matrix2[i])
       return -1;
@@ -76,7 +77,7 @@ int compare_matrices(int *matrix1, int *matrix2, int n){
  *
  * @return void)
  */
-void populate_matrix(int *matrix, int n) {
+void populate_matrix(int *matrix, const int n) {
   for (int i = 0; i < n*n; i++) {
     matrix[i] = (rand() % (MAX - MIN + 1)) + MIN;
   }
@@ -87,7 +88,7 @@ void populate_matrix(int *matrix, int n) {
  *
  * @return Returns 0 if successful (int)
  */
-int print_matrix(int *matrix, int n) {
+int print_matrix(const int *matrix, const int n) {
   printf("Printed matrix (%dx%d):\n",n, n);
   for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {
@@ -103,7 +104,7 @@ int print_matrix(int *matrix, int n) {
  *
  * @return void 0
  */
-void multiply_matrices(int *matrix1, int *matrix2, int *result, int n){
+void multiply_matrices(const int *matrix1, const int *matrix2, int *result, const int n){
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             for (int k = 0; k < n; k++) {
@@ -118,12 +119,12 @@ void multiply_matrices(int *matrix1, int *matrix2, int *result, int n){
  *
  * @return void 0
  */
-void multiply_matrices_sum(int *matrix1, int *matrix2, int *result, int n){
+void multiply_matrices_sum(const int *matrix1, const int *matrix2, int *result, const int n){
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
       int sum = 0;
       for (int k = 0; k < n; k++) {
-        sum += matrix1[i * n + k] * matrix2[k * n + j];
+        sum = matrix1[i * n + k] * matrix2[k * n + j] + sum;
       }
     result[i * n + j] = sum;
     }
@@ -135,7 +136,7 @@ void multiply_matrices_sum(int *matrix1, int *matrix2, int *result, int n){
  *
  * @return void 0
  */
-void multiply_matrices_strip(int *matrix1, int *matrix2, int *result, int n){
+void multiply_matrices_strip(const int *matrix1, const int *matrix2, int *result, const int n){
   for (int i = 0; i < n; i++) {
     for (int k = 0; k < n; k++) {
       for (int j = 0; j < n; j++) {
@@ -145,25 +146,25 @@ void multiply_matrices_strip(int *matrix1, int *matrix2, int *result, int n){
   }
 }
 
-/**
- * @brief Multiplies two matrices together and puts the result in a third
- *
- * @return void 0
- */
-void multiply_matrices_strip_unrolled(int *matrix1, int *matrix2, int *result, int n){
-  if (n < 4){
-    printf("%d is too small, requires n>=4 and a factor of 4.\n",n);
-    printf("Exiting....\n");
-    exit(1);
-  }
-  for (int i = 0; i < n; i++) {
-    for (int k = 0; k < n; k++) {
-      for (int j = 0; j < n; j+=4) {
-        result[i * n + j] += matrix1[i * n + k] * matrix2[k * n + j];
-        result[i * n + j + 1] += matrix1[i * n + k] * matrix2[k * n + j + 1];
-        result[i * n + j + 2] += matrix1[i * n + k] * matrix2[k * n + j + 2];
-        result[i * n + j + 3] += matrix1[i * n + k] * matrix2[k * n + j + 3];
+
+void multiply_matrices_blocked(const int *matrix1, const int *matrix2, int *result, const int n)
+{
+    for (int ii = 0; ii < n; ii+= BLOCK_SIZE) {
+      for (int kk = 0; kk < n; kk+= BLOCK_SIZE) {
+        for (int jj = 0; jj < n; jj+= BLOCK_SIZE) {
+          int limit_i = ((ii + BLOCK_SIZE) < n) ? (ii + BLOCK_SIZE) : n;
+          int limit_j = ((jj + BLOCK_SIZE) < n) ? (jj + BLOCK_SIZE) : n;
+          int limit_k = ((kk + BLOCK_SIZE) < n) ? (kk + BLOCK_SIZE) : n;
+          for (int i = ii; i < limit_i; ++i) {
+            for (int k = kk; k < limit_k; ++k) {
+              int ki = i * n + k;
+              for (int j = jj; j < limit_j; j++) {
+                result[i * n + j] += matrix1[ki] * matrix2[k * n + j];
+              }
+            }
+          }
+        }
       }
     }
-  }
 }
+

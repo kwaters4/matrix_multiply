@@ -107,6 +107,9 @@ int determined_test_mult(int *test_result, int n, enum Mult_Algo algo){
     case STRIP:
       multiply_matrices_strip(matrix1, matrix2, result, n);
       break;
+    case BLOCKED:
+      multiply_matrices_blocked(matrix1, matrix2, result, n);
+      break;
     default:
       printf("ERROR: No valid multiplication algorithm selected.\n");
       return -1;
