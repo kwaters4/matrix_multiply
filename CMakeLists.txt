@@ -17,7 +17,7 @@ target_sources(test_library PRIVATE lib/test_library.c)
 add_executable(driver src/main.c)
 target_link_libraries(driver PRIVATE matrix_mul timer)
 #set(CMAKE_C_FLAGS "-Wall -Wno-dev -g -O0")
-set(CMAKE_C_FLAGS "-Wall -Wno-dev -O3 -march=native -funroll-loops")
+set(CMAKE_C_FLAGS "-Wall -O3 -march=native -funroll-loops")
 
 if(ENABLE_TESTING)
   enable_testing()

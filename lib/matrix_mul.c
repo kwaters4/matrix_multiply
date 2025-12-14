@@ -9,8 +9,8 @@
  * @return void
  */
 int* malloc_matrix_int(int const n){
-  int *matrix = malloc((n*n) * sizeof(int));
-//  int *matrix = aligned_alloc((size_t) 32, (size_t)(n*n) * sizeof(int));
+//  int *matrix = malloc((n*n) * sizeof(int));
+  int *matrix = aligned_alloc((size_t) 32, (size_t)(n*n) * sizeof(int));
   if (matrix == NULL){
     printf("ERROR: Failed to allocate matrix of size %dx%d\n", n, n);
     printf("Exiting...\n");

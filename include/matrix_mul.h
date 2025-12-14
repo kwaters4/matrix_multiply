@@ -3,7 +3,7 @@
 # define MAX 5
 # define MIN -5
 
-#define BLOCK_SIZE 32
+#define BLOCK_SIZE 256
 
 int* malloc_matrix_int(const int n);
 void free_matrix_int(int *matrix);
