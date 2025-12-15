@@ -1,6 +1,5 @@
 #import "@preview/typslides:1.3.0": *
 #import "@preview/fontawesome:0.6.0"
-#import "@preview/cetz:0.4.2": util.matrix
 
 #show footnote.entry: set text(size: 10pt)
 #show figure.caption: emph
@@ -593,6 +592,3 @@
   Questions?
 ]
 
-// Bibliography
-//#let bib = bibliography("bibliography.bib")
-//#bibliography-slide(bib)
