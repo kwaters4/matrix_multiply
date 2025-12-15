@@ -22,4 +22,4 @@ void timer_start(struct timer* t, double work_done);
 void timer_stop(struct timer* t);
 void timer_print(struct timer* t);
 double timer_elapsed(struct timer* t);
-double timer_calc_ipc(struct timer* t);
+double timer_calc_work_per_cycle(struct timer* t);

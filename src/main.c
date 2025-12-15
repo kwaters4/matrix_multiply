@@ -5,17 +5,17 @@
 #include <timer.h>
 
 void print_header(){
-printf("n, trials, req. memory (KiB), time/trial (s), IPC, Read Bandwidth (GiB/s)\n");
+printf("n, trials, req. memory (KiB), time/trial (s), work/cycle, Read Bandwidth (GiB/s)\n");
 
 }
 
 void print_stats(struct timer *t, int n, int trials){
   // Matrix memory in KiB
   int req_memory = 3*n*n*sizeof(int)/1024;
-  double ipc = timer_calc_ipc(t);
+  double work_per_cycle = timer_calc_work_per_cycle(t);
   // Read Bandwitdh in GiB/s
   double bandwidth = (double) ((2*n*n * sizeof(int)))/(1024*1024*1024) / t->elapsed;
-  printf("%d, %d, %d, %f, %f, %f \n", n, trials, req_memory, t->elapsed/trials, ipc, bandwidth);
+  printf("%d, %d, %d, %f, %f, %f \n", n, trials, req_memory, t->elapsed/trials, work_per_cycle, bandwidth);
 }
 
 int main(int argc, char **argv) {
@@ -53,9 +53,10 @@ int main(int argc, char **argv) {
     populate_matrix(matrix2, i);
     generate_zero_matrix(result, i);
     // Warm up run
-    printf("Warm up... \n");
-    multiply_matrices_strip(matrix1, matrix2, result, i);
-//    multiply_matrices_blocked(matrix1, matrix2, result, i);
+//    multiply_matrices(matrix1, matrix2, result, i);
+//  multiply_matrices_sum(matrix1, matrix2, result, i);
+//    multiply_matrices_strip(matrix1, matrix2, result, i);
+    multiply_matrices_blocked(matrix1, matrix2, result, i);
 
     // Benchmarking...
     timer_start(&matrix_timer, num_trials * matrix_work);
@@ -63,8 +64,8 @@ int main(int argc, char **argv) {
 //      printf("Trial %d \n", trial);
 //      multiply_matrices(matrix1, matrix2, result, i);
 //      multiply_matrices_sum(matrix1, matrix2, result, i);
-      multiply_matrices_strip(matrix1, matrix2, result, i);
-//      multiply_matrices_blocked(matrix1, matrix2, result, i);
+//      multiply_matrices_strip(matrix1, matrix2, result, i);
+      multiply_matrices_blocked(matrix1, matrix2, result, i);
     }
     timer_stop(&matrix_timer);
 //    timer_print(&matrix_timer);

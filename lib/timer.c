@@ -52,7 +52,7 @@ void timer_print(struct timer *t){
   printf("elapsed (s)  : %f\n", t->elapsed);
 };
 
-double timer_calc_ipc(struct timer* t){
+double timer_calc_work_per_cycle(struct timer* t){
   if (t->active == 1){
     printf("WARNING: Timer was not stopped, now it is\n");
     timer_stop(t);
