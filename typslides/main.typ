@@ -410,7 +410,7 @@
 ]
 
 #slide(title: "Block Matrix Multiply")[
-  - This is where optimizations start becoming unpleasant as it is not harward agnostic, however we do not intrinsics yet!
+  - This is where optimizations start becoming unpleasant as it is not hardware agnostic, however we are not using intrinsics yet!
 
   - The ``BLOCK_SIZE`` variable is a compile time constant, requiring the library to be recompiled.
 
