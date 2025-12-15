@@ -572,7 +572,7 @@
 		- and many more #footnote[https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Implementations]
 	- Sparsity may drive to different algorithms.
 	- If working with integers you may have to write your own kernels.
-	- If working with Boolean matrices they allow for look-up tables #footnote[Method of Four Russians]
+	- If working with Boolean matrices they allow for new algorthms using look-up tables #footnote[Method of Four Russians]
 ]
 
 // Parallelization Matter
