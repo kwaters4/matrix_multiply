@@ -6,7 +6,6 @@
 
 void print_header(){
 printf("n, trials, req. memory (KiB), time/trial (s), work/cycle, Read Bandwidth (GiB/s)\n");
-
 }
 
 void print_stats(struct timer *t, int n, int trials){
@@ -53,22 +52,20 @@ int main(int argc, char **argv) {
     populate_matrix(matrix2, i);
     generate_zero_matrix(result, i);
     // Warm up run
-//    multiply_matrices(matrix1, matrix2, result, i);
+    multiply_matrices(matrix1, matrix2, result, i);
 //  multiply_matrices_sum(matrix1, matrix2, result, i);
 //    multiply_matrices_strip(matrix1, matrix2, result, i);
-    multiply_matrices_blocked(matrix1, matrix2, result, i);
+//    multiply_matrices_blocked(matrix1, matrix2, result, i);
 
     // Benchmarking...
     timer_start(&matrix_timer, num_trials * matrix_work);
     for (int trial = 0; trial < num_trials; trial++){
-//      printf("Trial %d \n", trial);
-//      multiply_matrices(matrix1, matrix2, result, i);
+      multiply_matrices(matrix1, matrix2, result, i);
 //      multiply_matrices_sum(matrix1, matrix2, result, i);
 //      multiply_matrices_strip(matrix1, matrix2, result, i);
-      multiply_matrices_blocked(matrix1, matrix2, result, i);
+//      multiply_matrices_blocked(matrix1, matrix2, result, i);
     }
     timer_stop(&matrix_timer);
-//    timer_print(&matrix_timer);
     print_stats(&matrix_timer, i, num_trials);
 
     free(matrix1);

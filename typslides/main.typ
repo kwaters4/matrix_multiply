@@ -228,8 +228,7 @@
 
 #slide(title: "Naive Matrix Multiply")[
  #figure(
-  image("images/cpu.pdf", width: 85%),
-  caption: [Add plot with matrix multiply]
+  image("images/naive_c.pdf", width: 55%),
   )
 ]
 
@@ -255,109 +254,12 @@
  ]
  - Total memory is 3x the memory per matrix.
 ]
+#slide(title: "Memory Footprint Revisted")[
 
-#slide(title: "Intermediate Sum Matrix Multiply")[
-  #framed(title: "Intermediate Sum")[
-  #set text(size: 16pt)
-    ```c
-		for (int i = 0; i < n; i++) {
-		  for (int j = 0; j < n; j++) {
-		    int sum = 0;
-		    for (int k = 0; k < n; k++) {
-		      sum = matrix1[i * n + k] * matrix2[k * n + j] + sum;
-		    }
-		  result[i * n + j] = sum;
-		  }
-		}
-    ```
-  ]
-  - Allows for sum to stay in registers requiring less fetching from memory, a little bit faster.
-]
-
-#slide(title: "Intermediate Sum Matrix Multiply")[
  #figure(
-  image("images/cpu.pdf", width: 85%),
-  caption: [Add additional data with matrix multiply]
+  image("images/memory_scale.pdf", width: 80%),
+  caption: [Memory requirement for three $n x n$ matrices.]
   )
-]
-
-#slide(title: "Loop Re-ording Matrix Multiply")[
-  #framed(title: "Loop Re-ording Sum")[
-  #set text(size: 16pt)
-    ```c
-  	for (int i = 0; i < n; i++) {
-  	  for (int k = 0; k < n; k++) {
-  	    for (int j = 0; j < n; j++) {
-  	      result[i * n + j] += matrix1[i * n + k] * matrix2[k * n + j];
-  	    }
-  	  }
-  	}
-    ```
-  ]
-  - Re-ording the last two loops (j with k) enabling better caching behavior, go faster!
-]
-
-#slide(title: "Loop Re-ordering Matrix Multiply")[
- #figure(
-  image("images/cpu.pdf", width: 85%),
-  caption: [Add additional data with matrix multiply]
-  )
-]
-
-#slide(title: "Block Matrix Multiply")[
-  #framed(title: "Blocking")[
-  #set text(size: 12pt)
-    ```c
-		for (int ii = 0; ii < n; ii+= BLOCK_SIZE) {
-      for (int kk = 0; kk < n; kk+= BLOCK_SIZE) {
-        for (int jj = 0; jj < n; jj+= BLOCK_SIZE) {
-          int limit_i = ((ii + BLOCK_SIZE) < n) ? (ii + BLOCK_SIZE) : n;
-          int limit_j = ((jj + BLOCK_SIZE) < n) ? (jj + BLOCK_SIZE) : n;
-          int limit_k = ((kk + BLOCK_SIZE) < n) ? (kk + BLOCK_SIZE) : n;
-          for (int i = ii; i < limit_i; ++i) {
-            for (int k = kk; k < limit_k; ++k) {
-              int ki = i * n + k;
-              for (int j = jj; j < limit_j; j++) {
-                result[i * n + j] += matrix1[ki] * matrix2[k * n + j];
-              }
-            }
-          }
-        }
-      }
-    }
-
-    ```
-  ]
-  - This is where optimizations start becoming unpleasant, however we do not intrinsics yet!
-	- The ``BLOCK_SIZE`` variable is a compile time constant, requiring the library to be recompiled.
-	#figure(
-	image("images/gemm_tiled.png", width: 80%),
-	caption: [Gemm tiling or BLOCK_SIZE.#footnote[Mathhes et. al. Tuning and Optimization for a Variety of Many-Core Architectures Without Changing a Single Line of Implementation Code Using the Alpaka Library (2017)]]
-	)
-]
-
-#slide(title: "Loop Re-ordering Matrix Multiply")[
- #figure(
-  image("images/cpu.pdf", width: 85%),
-  caption: [Add additional data with matrix multiply]
-  )
-]
-
-// Instruction Set
-#slide(title: "What CPU do I have?")[
-  #framed(title: "Checking the Hardware")[
-  #set text(size: 16pt)
-    ```bash
-    ❯ for i in Architecture "CPU(s):" "Model name" Thread Socket "NUMA node(s)"; do lscpu | grep "$i" | grep -v "node0"; done
-
-    Architecture:                         x86_64
-    CPU(s):                               16
-    Model name:                           Intel(R) Core(TM) i7-10700KF CPU @ 3.80GHz
-    Thread(s) per core:                   2
-    Socket(s):                            1
-    NUMA node(s):                         1
-    ```
-  ]
 ]
 
 #slide(title: "Skylake Topology")[
@@ -376,45 +278,6 @@
   - Individual 32 KiB instruction and data caches
   - Two logical cores per physical core (8 physical, 16 logical)
 
-]
-
-#slide(title: "Memory Footprint Revisted")[
-
- #figure(
-  image("images/memory_scale.pdf", width: 80%),
-  caption: [Memory requirement for three $n x n$ matrices.]
-  )
-]
-
-// Instruction Set (Overview)
-#slide(title: "Instructions Set Architecture (ISA)")[
-  - ``x86``#footnote[ARM has different names for everything] SIMD #footnote[Single Instruction, Multiple Data] extensions:
-    - *SSE (Streaming SIMD Extensions)* - 128-bit floating point registers
-    - *SSE2* - 128-bit doubles and integer registers
-    - *AVX (Advanced Vector Extensions)* - 256-bit floating/double point registers
-    - *AVX2* - 256-bit integer SSE instructions
-    - *AVX512(f)* - 512 bit registers!
-  - *FMA(Fused Multiply-Add)* - Exists in AVX, AVX512
-]
-
-
-// A simple slide
-#slide(title: "Instructions Set Architecture (ISA)")[
-  #framed(title: "Checking the Architecture and ISA")[
-  #set text(size: 14pt)
-  ```bash
-  ❯ cat /sys/devices/cpu/caps/pmu_name
-  skylake
-
-  ❯ for isa in sse sse2 avx avx2 avx512 fma; do grep -q "$isa" /proc/cpuinfo && echo "$isa  1" || echo "$isa  0"; done
-  sse  1
-  sse2  1
-  avx  1
-  avx2  1
-  avx512  0
-  fma  1
-  ```
-  ]
 ]
 
 // Table
@@ -442,9 +305,258 @@
   ]
 ]
 
+#slide(title: "Memory Footprint Revisted")[
+
+ #figure(
+  image("images/memory_scale.pdf", width: 80%),
+  caption: [Memory requirement for three $n x n$ matrices.]
+  )
+]
+
+#slide(title: "Whole Program Performance Metrics")[
+  #framed(title: "Intermediate Sum")[
+  #set text(size: 14pt)
+   ```bash
+  ❯ perf stat -e cycles,instructions,cache-references,cache-misses ./build/driver 2048 2048 5
+  n, trials, req. memory (KiB), time/trial (s), work/cycle, Read Bandwidth (GiB/s)
+  s2048, 5, 49152, 21.019992, 0.215482, 0.000297
+
+   Performance counter stats for './build/driver 2048 2048 5':
+
+     603,229,008,482      cycles:u
+     156,197,169,903      instructions:u                   #    0.26  insn per cycle
+     100,483,589,712      cache-references:u
+       7,718,024,466      cache-misses:u                   #    7.68% of all cache refs
+  ```
+  ]
+  - More targeted data can be found with PAPI #footnote[Performance Application Programming Interface]
+]
+
+
+#slide(title: "Intermediate Sum Matrix Multiply")[
+  #framed(title: "Intermediate Sum")[
+  #set text(size: 16pt)
+    ```c
+		for (int i = 0; i < n; i++) {
+		  for (int j = 0; j < n; j++) {
+		    int sum = 0;
+		    for (int k = 0; k < n; k++) {
+		      sum = matrix1[i * n + k] * matrix2[k * n + j] + sum;
+		    }
+		  result[i * n + j] = sum;
+		  }
+		}
+    ```
+  ]
+  - Allows for sum to stay in registers requiring less fetching from memory, a little bit faster.
+]
+
+#slide(title: "Intermediate Sum Matrix Multiply")[
+ #figure(
+  image("images/naive_sum_c.pdf", width: 55%),
+  )
+]
+
+#slide(title: "Loop Re-ording Matrix Multiply")[
+  #framed(title: "Loop Re-ording Sum")[
+  #set text(size: 16pt)
+    ```c
+  	for (int i = 0; i < n; i++) {
+  	  for (int k = 0; k < n; k++) {
+  	    for (int j = 0; j < n; j++) {
+  	      result[i * n + j] += matrix1[i * n + k] * matrix2[k * n + j];
+  	    }
+  	  }
+  	}
+    ```
+  ]
+  - Re-ording the last two loops (j with k) enabling better caching behavior.
+]
+
+#slide(title: "Loop Re-ordering Matrix Multiply")[
+ #figure(
+  image("images/naive_sum_strip_c.pdf", width: 55%),
+  )
+]
+
+#slide(title: "Block Matrix Multiply")[
+  #framed(title: "Blocking")[
+  #set text(size: 12pt)
+    ```c
+		for (int ii = 0; ii < n; ii+= BLOCK_SIZE) {
+      for (int kk = 0; kk < n; kk+= BLOCK_SIZE) {
+        for (int jj = 0; jj < n; jj+= BLOCK_SIZE) {
+          int limit_i = ((ii + BLOCK_SIZE) < n) ? (ii + BLOCK_SIZE) : n;
+          int limit_j = ((jj + BLOCK_SIZE) < n) ? (jj + BLOCK_SIZE) : n;
+          int limit_k = ((kk + BLOCK_SIZE) < n) ? (kk + BLOCK_SIZE) : n;
+          for (int i = ii; i < limit_i; ++i) {
+            for (int k = kk; k < limit_k; ++k) {
+              int ki = i * n + k;
+              for (int j = jj; j < limit_j; j++) {
+                result[i * n + j] += matrix1[ki] * matrix2[k * n + j];
+              }
+            }
+          }
+        }
+      }
+    }
+
+    ```
+  ]
+]
+#slide(title: "Block Matrix Multiply")[
+	#figure(
+	image("images/gemm_tiled.png", width: 80%),
+	caption: [Gemm tiling or BLOCK_SIZE.#footnote[Mathhes et. al. Tuning and Optimization for a Variety of Many-Core Architectures Without Changing a Single Line of Implementation Code Using the Alpaka Library (2017)]]
+	)
+]
+
+#slide(title: "Block Matrix Multiply")[
+  - This is where optimizations start becoming unpleasant as it is not harward agnostic, however we do not intrinsics yet!
+
+  - The ``BLOCK_SIZE`` variable is a compile time constant, requiring the library to be recompiled.
+
+  - We will recompile until we find an optimal BLOCK_SIZE value.
+
+]
+
+
+#slide(title: "Loop Re-ordering Matrix Multiply BLOCK_SIZE")[
+ #figure(
+  image("images/block_c.pdf", width: 55%),
+  )
+]
+#slide(title: "Whole Program Performance Metrics")[
+  #framed(title: "BLOCK_SIZE 512")[
+  #set text(size: 14pt)
+   ```bash
+  ❯ perf stat -e cycles,instructions,cache-references,cache-misses ./build/driver 2048 2048 5
+  2048, 5, 49152, 0.792592, 5.714694, 0.007886
+
+  Performance counter stats for './build/driver 2048 2048 5':
+
+    22,990,040,828      cycles:u
+    26,574,845,684      instructions:u                   #    1.16  insn per cycle
+     7,550,989,191      cache-references:u
+       121,521,554      cache-misses:u                   #    1.61% of all cache refs
+  ```
+  ]
+  - Naive L3 cache misses was 7.68%, PAPI would give better resolution. There is still better cache performance possible.
+]
+
+#slide(title: "All Methods")[
+ #figure(
+  image("images/all_c.pdf", width: 55%),
+  )
+]
+
+// Instruction Set
+#slide(title: "What CPU do I have?")[
+  #framed(title: "Checking the Hardware")[
+  #set text(size: 16pt)
+    ```bash
+    ❯ for i in Architecture "CPU(s):" "Model name" Thread Socket "NUMA node(s)"; do lscpu | grep "$i" | grep -v "node0"; done
+
+    Architecture:                         x86_64
+    CPU(s):                               16
+    Model name:                           Intel(R) Core(TM) i7-10700KF CPU @ 3.80GHz
+    Thread(s) per core:                   2
+    Socket(s):                            1
+    NUMA node(s):                         1
+    ```
+  ]
+]
+
+
+// Instruction Set (Overview)
+#slide(title: "Instructions Set Architecture (ISA)")[
+  - ``x86``#footnote[ARM has different names for everything] SIMD #footnote[Single Instruction, Multiple Data] extensions:
+    - *SSE (Streaming SIMD Extensions)* - 128-bit floating point registers
+    - *SSE2* - 128-bit doubles and integer registers
+    - *AVX (Advanced Vector Extensions)* - 256-bit floating/double point registers
+    - *AVX2* - 256-bit integer SSE instructions
+    - *AVX512* - 512 bit registers!
+  - *FMA(Fused Multiply-Add)* - Exists in AVX, AVX512, but only for floats and doubles.
+]
+
+
+#slide(title: "Instructions Set Architecture (ISA)")[
+  #framed(title: "Checking the Architecture and ISA")[
+  #set text(size: 14pt)
+  ```bash
+  ❯ cat /sys/devices/cpu/caps/pmu_name
+  skylake
+
+  ❯ for isa in sse sse2 avx avx2 avx512 fma; do grep -q "$isa" /proc/cpuinfo && echo "$isa  1" || echo "$isa  0"; done
+  sse  1
+  sse2  1
+  avx  1
+  avx2  1
+  avx512  0
+  fma  1
+  ```
+  ]
+]
+
+#slide(title: "Instructions Set Architecture (ISA)")[
+  #framed(title: "Checking for SIMD (AVX2)")[
+  #set text(size: 10pt)
+  ```assembly
+    10b0:	c4 c2 7d 40 4c 8a a0 	vpmulld -0x60(%r10,%rcx,4),%ymm0,%ymm1
+    10b7:	c4 c2 7d 40 54 8a c0 	vpmulld -0x40(%r10,%rcx,4),%ymm0,%ymm2
+    10be:	c4 c2 7d 40 5c 8a e0 	vpmulld -0x20(%r10,%rcx,4),%ymm0,%ymm3
+    10c5:	c4 c2 7d 40 24 8a    	vpmulld (%r10,%rcx,4),%ymm0,%ymm4
+    10cb:	c4 c1 75 fe 4c 88 a0 	vpaddd -0x60(%r8,%rcx,4),%ymm1,%ymm1
+    10d2:	c4 c1 6d fe 54 88 c0 	vpaddd -0x40(%r8,%rcx,4),%ymm2,%ymm2
+    10d9:	c4 c1 65 fe 5c 88 e0 	vpaddd -0x20(%r8,%rcx,4),%ymm3,%ymm3
+    10e0:	c4 c1 5d fe 24 88    	vpaddd (%r8,%rcx,4),%ymm4,%ymm4
+    10e6:	c4 c1 7e 7f 4c 88 a0 	vmovdqu %ymm1,-0x60(%r8,%rcx,4)
+    10ed:	c4 c1 7e 7f 54 88 c0 	vmovdqu %ymm2,-0x40(%r8,%rcx,4)
+    10f4:	c4 c1 7e 7f 5c 88 e0 	vmovdqu %ymm3,-0x20(%r8,%rcx,4)
+    10fb:	c4 c1 7e 7f 24 88    	vmovdqu %ymm4,(%r8,%rcx,4)
+  ```
+  ]
+  - Excerpt from multiplication library (appears some pipelining is going on!) #footnote[More details can be found in the Intel Intrinsics Guide].
+]
+
+#slide(title: "Work per Clock Cycles (Normalized Data)")[
+ #figure(
+  image("images/all_cycle_c.pdf", width: 55%),
+  )
+]
+
+
 // Compilers
 #slide(title: "GCC vs. Clang")[
+ #figure(
+  image("images/all_compiler_c.pdf", width: 55%),
+  )
 ]
+
+// Conclusion Slide
+#slide(title: "Long Journey (Int32)")[
+  #align(center)[
+    #figure[
+      #table(
+      columns: 4,
+      []   , table.cell(colspan:3, [*Runtime (s)*]),
+      [*Matrix size (n)*], [*Pure Python*], [*Python (NumPy)*], [*Blocked C*],
+      [256],  [0.24], [0.02], [0.001],
+      [512],  [1.79], [0.18], [0.01],
+      [1024], [15.32],[1.46], [0.10],
+      [2048], []    , [26.40], [0.81],
+      [4096], []    , []      ,[6.55],
+      )
+    ]
+  ]
+  - Final results with the different run times. More optimization is possible for C and NumPy.
+]
+
+
+
+
+
+
 
 // Title slides create new sections
 #title-slide[

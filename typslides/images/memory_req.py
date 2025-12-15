@@ -1,10 +1,3 @@
-
-#n = 64
-#while n <= 4096:
-#    print(n, n*n, 4*n*n/1024, 12*n*n/1024)
-#    n = n * 2
-
-
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 

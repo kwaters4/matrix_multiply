@@ -1,10 +1,8 @@
 import random
 import time
 
-N = 1024
-
 # Function for matrix multiplication
-def matrix_multiply(A, B, data_type):
+def matrix_multiply(A, B, data_type, N):
 
     result = [[0 for _ in range(N)] for _ in range(N)]
 
@@ -18,15 +16,17 @@ def matrix_multiply(A, B, data_type):
     end = time.time()
 
     # Printing the time it took for multiplication
-    print(f"{data_type:10s} Time: {end - start:.6f} seconds")
+    total_time = (end - start)/5.0
+    print(f"{N}, {data_type}, {total_time:.6f}")
     return
 
-# Generate random 1024x1024 matrices
-print(f"{N}x{N} matrix multiply...")
-A = [[random.randint(-5, 5) for _ in range(N)] for _ in range(N)]
-B = [[random.randint(-5, 5) for _ in range(N)] for _ in range(N)]
-matrix_multiply(A, B, "Int")
+sizes = [256, 512, 1024, 2048]
+print(f"n, type, time (s)")
+for N in sizes:
+    A = [[random.randint(-5, 5) for _ in range(N)] for _ in range(N)]
+    B = [[random.randint(-5, 5) for _ in range(N)] for _ in range(N)]
+    matrix_multiply(A, B, "Int", N)
 
-A = [[random.random() for _ in range(N)] for _ in range(N)]
-B = [[random.random() for _ in range(N)] for _ in range(N)]
-matrix_multiply(A, B, "Float")
+#A = [[random.random() for _ in range(N)] for _ in range(N)]
+#B = [[random.random() for _ in range(N)] for _ in range(N)]
+#matrix_multiply(A, B, "Float")
