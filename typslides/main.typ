@@ -327,7 +327,7 @@
        7,718,024,466      cache-misses:u                   #    7.68% of all cache refs
   ```
   ]
-  - More targeted data can be found with PAPI #footnote[Performance Application Programming Interface]
+  - More targeted data can be found with PAPI (Performance Application Programming Interface).
 ]
 
 
@@ -405,7 +405,7 @@
 #slide(title: "Block Matrix Multiply")[
 	#figure(
 	image("images/gemm_tiled.png", width: 80%),
-	caption: [Gemm tiling or BLOCK_SIZE.#footnote[Mathhes et. al. Tuning and Optimization for a Variety of Many-Core Architectures Without Changing a Single Line of Implementation Code Using the Alpaka Library (2017)]]
+	caption: [GEMM tiling or BLOCK_SIZE.#footnote[Mathhes et. al. Tuning and Optimization for a Variety of Many-Core Architectures Without Changing a Single Line of Implementation Code Using the Alpaka Library (2017)]]
 	)
 ]
 
