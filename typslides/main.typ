@@ -31,8 +31,7 @@
 #slide(title: "Code and Talk")[
   - The code and talk for this presentation can be found #link("https://github.com/kwaters4/matrix_multiply")[here].
   #figure(
-  image("images/cluster.jpg", width: 40%),
-  caption: [TODO: CHANGE IMAGE AND MAKE LINK!!! Code and presentation available, still some cleaning up possible.]
+  image("images/git_repo.png", width: 80%),
   )
 ]
 
