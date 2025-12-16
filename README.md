@@ -28,7 +28,7 @@ CC=clang cmake ../ --fresh \
   -DCMAKE_INSTALL_PREFIX=/home/cosmicbox/Documents/Talk/code/Matrix/INSTALL \
   -DENABLE_TESTING=1 \
   -DBLOCK_SIZE="64"
-``
+```
 
 - 'ENABLE_TESTING'(0) - Enables building of the ctests.
 - 'BLOCK_SIZE'(32) - Toggles how big the block size is for tiled matrix multiplication.
