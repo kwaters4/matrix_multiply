@@ -46,7 +46,7 @@ make
 ctest .
 ```
 
-## INSTALL
+## Install
 
 ```
 make install

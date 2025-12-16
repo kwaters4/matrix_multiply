@@ -252,11 +252,11 @@
  ]
  - Total memory is 3x the memory per matrix.
 ]
-#slide(title: "Memory Footprint Revisted")[
+#slide(title: "Memory Footprint Revisited")[
 
  #figure(
   image("images/memory_scale.pdf", width: 80%),
-  caption: [Memory requirement for three $n x n$ matrices.]
+  caption: [Memory requirement for three nxn matrices.]
   )
 ]
 
@@ -269,13 +269,11 @@
 ]
 
 #slide(title: "Skylake Topology (Highlights)")[
-
   - One NUMA domain
   - One 16 MiB shared L3 cache
   - Individual 256 KiB L2 cache
   - Individual 32 KiB instruction and data caches
   - Two logical cores per physical core (8 physical, 16 logical)
-
 ]
 
 // Table
@@ -301,14 +299,6 @@
     ]
   Latencies to generate intuition for the cost of an operation.#footnote[Originally by Peter Norvig: http://norvig.com/21-days.html#answers]
   ]
-]
-
-#slide(title: "Memory Footprint Revisted")[
-
- #figure(
-  image("images/memory_scale.pdf", width: 80%),
-  caption: [Memory requirement for three $n x n$ matrices.]
-  )
 ]
 
 #slide(title: "Whole Program Performance Metrics")[
@@ -412,10 +402,9 @@
 #slide(title: "Block Matrix Multiply")[
   - This is where optimizations start becoming unpleasant as it is not hardware agnostic, however we are not using intrinsics yet!
 
-  - The ``BLOCK_SIZE`` variable is a compile time constant, requiring the library to be recompiled.
+  - The ``BLOCK_SIZE`` variable is a configure time constant, requiring the library to be reconfigured and recompiled.
 
   - We will recompile until we find an optimal BLOCK_SIZE value.
-
 ]
 
 
@@ -475,6 +464,7 @@
     - *AVX2* - 256-bit integer SSE instructions
     - *AVX512* - 512 bit registers!
   - *FMA(Fused Multiply-Add)* - Exists in AVX, AVX512, but only for floats and doubles.
+  $ "result" = a * b + c $
 ]
 
 
@@ -517,15 +507,42 @@
   - Excerpt from multiplication library (appears some pipelining is going on!) #footnote[More details can be found in the Intel Intrinsics Guide].
 ]
 
-#slide(title: "Work per Clock Cycles (Normalized Data)")[
+#slide(title: "What is Good Performance?")[
  #figure(
   image("images/all_cycle_c.pdf", width: 55%),
   )
+  AVX2 Throughput: $ 256 "bit"/"cycle" * (1 "byte")/(8 "bit") (1 "int")/(4 "byte") = 8 "int"/"cycle" $
+  - This is a complicated question (multiply + addition):
+  #align(center)[
+    #show math.equation: set text(24pt)
+    $c_(i j) = sum a_(i j) b_(k j) $
+  ]
 ]
 
+#slide(title: "Max Performance Estimation (x86 Is Hard)")[
+  #cols(columns: (2fr, 2fr), gutter: 2em)[
+    #[
+    ]
+      #figure(
+      image("images/vpadd.png", width: 70%),
+    )
+  ][
+      #figure(
+      image("images/vpmull.png", width: 70%),
+      )
+  ]
+  - Taken from the Intel Intrinsics Guide #footnote[https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html]
+]
+
+#slide(title: "Max Performance Estimation (x86 Is Hard)")[
+  #figure(
+  image("images/skylake_alu.png", width: 80%),
+  caption:[Cut out from the Skylake micro-architecture #footnote[https://en.wikichip.org/wiki/intel/microarchitectures/skylake_%28client%29]]
+  )
+]
 
 // Compilers
-#slide(title: "GCC vs. Clang")[
+#slide(title: "Compilers: GCC vs. Clang")[
  #figure(
   image("images/all_compiler_c.pdf", width: 55%),
   )
@@ -547,13 +564,21 @@
       )
     ]
   ]
-  - Final results with the different run times. More optimization is possible for C and NumPy.
+  - More optimization is possible for C and NumPy. Beating NumPy in this case is easy.
 ]
 
-
-
-
-
+// Types Matter
+#slide(title: "Some Additional Strategies")[
+  - Ask yourself, does it need to be further optimized?
+    - Has someone else done it?
+  - Pack matrix B into contiguous blocks of memory.
+    - Row major matrices, it is being accessed as a column.
+    - May assist in better pipelining
+  - Continue additional block techniques to better utilize the L1 and L2 caches.
+  - Start using more cores, making sure to avoid race conditions and atomics (if possible)
+  - On the surface, ints will be 1/2 as fast as floats (due to FMA)
+  - Add generics to enable multiple data types for a more robust library.
+]
 
 
 // Title slides create new sections
@@ -570,7 +595,7 @@
 		- and many more #footnote[https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Implementations]
 	- Sparsity may drive to different algorithms.
 	- If working with integers you may have to write your own kernels.
-	- If working with Boolean matrices they allow for new algorthms using look-up tables #footnote[Method of Four Russians]
+	- If working with Boolean matrices they allow for new algorithms using look-up tables #footnote[Method of Four Russians].
 ]
 
 // Parallelization Matter
@@ -578,7 +603,7 @@
   - *OpenMP/PThreads*
     - Using all cores on a socket/node
   - *Simultaneous Multithreading (SMT/HyperThreading)*
-    - Should it be used?
+    - Should it be used for this application?
   - *Non-Uniform Memory Access (NUMA)*
     - Even more levels to the memory subsystem
     - AMD's Core Complex (CCX) have made this harder
