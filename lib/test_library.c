@@ -89,40 +89,40 @@ void set_4x4_test_matrix(int *test_result){
 
 int determined_test_mult(int *test_result, int n, enum Mult_Algo algo){
   int ret;
-  int *matrix1 = malloc_matrix_int(n);
-  int *matrix2 = malloc_matrix_int(n);
-  int *result = malloc_matrix_int(n);
+  int *A = malloc_matrix_int32(n);
+  int *B = malloc_matrix_int32(n);
+  int *C = malloc_matrix_int32(n);
 
-  test_nxn_A(matrix1, n);
-  test_nxn_B(matrix2, n);
-  generate_zero_matrix(result, n);
+  test_nxn_A(A, n);
+  test_nxn_B(B, n);
+  zero_matrix(C, n);
 
   switch(algo) {
     case NAIVE:
-      multiply_matrices(matrix1, matrix2, result, n);
+      matmul(A, B, C, n);
       break;
     case SUM:
-      multiply_matrices_sum(matrix1, matrix2, result, n);
+      matmul_sum(A, B, C, n);
       break;
     case STRIP:
-      multiply_matrices_strip(matrix1, matrix2, result, n);
+      matmul_strip(A, B, C, n);
       break;
     case BLOCKED:
-      multiply_matrices_blocked(matrix1, matrix2, result, n);
+      matmul_blocked(A, B, C, n);
       break;
     default:
       printf("ERROR: No valid multiplication algorithm selected.\n");
       return -1;
   }
 
-  ret = compare_matrices(result, test_result, n);
+  ret = compare_matrices(C, test_result, n);
   if(ret < 0){
     printf("ERROR: Multiplication failed for %dx%d matrices.\n",n, n);
   }
 
-  free_matrix_int(matrix1);
-  free_matrix_int(matrix2);
-  free_matrix_int(result);
+  free_matrix(A);
+  free_matrix(B);
+  free_matrix(C);
   return ret;
 }
 

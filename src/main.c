@@ -34,12 +34,12 @@ int main(int argc, char **argv) {
   print_header();
   for(size_t i = min_size; i<= max_size; i=2*i) {
     int req_memory = 3*i*i*sizeof(int);
-    int *matrix1 = malloc((i*i) * sizeof(int));
-    int *matrix2 = malloc((i*i) * sizeof(int));
-    int *result = malloc((i*i) * sizeof(int));
+    float *A = malloc((i*i) * sizeof(int));
+    float *B = malloc((i*i) * sizeof(int));
+    float *C = malloc((i*i) * sizeof(int));
 
     // Check if the allocation failed.
-    if (matrix1 == NULL || matrix2 == NULL){
+    if (A == NULL || B == NULL){
       printf("Failed to allocated matrices, memory required: %d \n)", req_memory);
       printf("Exiting...\n");
     }
@@ -48,28 +48,28 @@ int main(int argc, char **argv) {
     double matrix_work = (double) (2*i*i*i - i*i);
 
   // Generate Random initial matrix
-    populate_matrix(matrix1, i);
-    populate_matrix(matrix2, i);
-    generate_zero_matrix(result, i);
+    populate_matrix(A, i);
+    populate_matrix(B, i);
+    zero_matrix(C, i);
     // Warm up run
-    multiply_matrices(matrix1, matrix2, result, i);
-//  multiply_matrices_sum(matrix1, matrix2, result, i);
-//    multiply_matrices_strip(matrix1, matrix2, result, i);
-//    multiply_matrices_blocked(matrix1, matrix2, result, i);
+//    matmul(A, B, C, i);
+//  matmul_sum(A, B, C, i);
+//    matmul_strip(A, B, C, i);
+    matmul_blocked(A, B, C, i);
 
     // Benchmarking...
     timer_start(&matrix_timer, num_trials * matrix_work);
     for (int trial = 0; trial < num_trials; trial++){
-      multiply_matrices(matrix1, matrix2, result, i);
-//      multiply_matrices_sum(matrix1, matrix2, result, i);
-//      multiply_matrices_strip(matrix1, matrix2, result, i);
-//      multiply_matrices_blocked(matrix1, matrix2, result, i);
+//      matmul(A, B, C, i);
+//      matmul_sum(A, B, C, i);
+//      matmul_strip(A, B, C, i);
+      matmul_blocked(A, B, C, i);
     }
     timer_stop(&matrix_timer);
     print_stats(&matrix_timer, i, num_trials);
 
-    free(matrix1);
-    free(matrix2);
-    free(result);
+    free(A);
+    free(B);
+    free(C);
   }
 }

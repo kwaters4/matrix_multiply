@@ -6,7 +6,7 @@ project(MatrixMultiplication VERSION 0.1 LANGUAGES C)
 
 set(BLOCK_SIZE "32" CACHE STRING "BLOCK_SIZE for matrix multiply")
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/config/matrix_mul.h.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/matrix_mul.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/matrix_mul.h"
     @ONLY
 )
